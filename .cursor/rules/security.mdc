@@ -1,0 +1,54 @@
+---
+description: Supabase RLS and security requirements — non-negotiable
+globs: ["supabase/**", "**/migrations/**", "**/*.sql"]
+alwaysApply: true
+---
+
+# Security Rules — Non-Negotiable
+
+The previous version of this app shipped `timesheet_adjustments` with Row Level
+Security DISABLED, which meant anyone holding the anon/publishable key could read
+or write every row in that table with no login required. This must never happen
+again in this rebuild.
+
+## Row Level Security (RLS)
+
+- Every table created in the `public` schema MUST have RLS enabled in the same
+  migration that creates the table. Never create a table and defer enabling RLS
+  to "later."
+- Every table must have at least one policy before it is considered done. A table
+  with RLS enabled but zero policies is effectively locked to everyone except
+  `service_role` — confirm this is the intended state if no policy is added yet,
+  don't leave it ambiguous.
+- Default posture: no anon-key read or write access to any table containing
+  worker data, timesheet data, salary data, or client billing data. Only
+  authenticated, role-scoped access is allowed.
+- Before generating any migration that creates a table, explicitly state in your
+  response which RLS policy you are applying and why. If you are not enabling RLS
+  on a new public table, you must say so explicitly and explain why — never do
+  this silently.
+
+## Audit trail
+
+- Every write (insert/update/delete) to `timesheets`, `salary_sheets`,
+  `client_payouts`, or `workers` must be captured in `audit_log` with:
+  `user_id`, `table_name`, `record_id`, `action`, `old_value`, `new_value`,
+  `changed_at`.
+- `timesheet_adjustments` is the audit trail for retroactive payroll corrections
+  specifically. It must always have RLS enabled, since it is load-bearing for
+  the payroll history — treat it with the same care as the `timesheets` table
+  itself, not as a secondary/logging table.
+
+## Verification habit
+
+After any migration that adds or modifies tables, proactively suggest running
+Supabase's advisor check for security issues (RLS gaps, missing policies) before
+considering the migration complete. Do not wait to be asked.
+
+## Secrets
+
+- Never hardcode Supabase URLs, service_role keys, or any API secrets directly in
+  application code. All secrets must come from environment variables, and
+  `.env` must remain in `.gitignore` at all times — never commit it.
+- The `service_role` key must never be used in client-side/browser code. It is
+  server-side only (edge functions, backend scripts).

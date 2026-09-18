@@ -1,0 +1,92 @@
+---
+description: Confirmed payroll calculation rules — absence penalty, bonus, salary floor
+globs: ["**/calculations/**", "**/*penalty*", "**/*bonus*", "**/*salary*", "**/*payroll*"]
+alwaysApply: false
+---
+
+# Business Rules — Confirmed and Final
+
+These rules were confirmed directly against the staffing agency's real business
+data after multiple rounds of correction. Do NOT reinterpret, "simplify," or change
+these formulas without an explicit, direct instruction from the user that includes
+new worked examples. If asked to modify them, always re-verify against the worked
+values below before shipping.
+
+## Absence penalty formula (CONFIRMED FINAL)
+
+```
+Days 1–2:  free, 0 penalty
+Days 3–7:  25 AED per absent day, counted cumulatively
+Days 8+:   50 AED per absent day beyond day 7, ADDED on top of the
+           125 AED already accrued from days 3–7
+```
+
+Formula: `penalty = min(max(days - 2, 0), 5) * 25 + max(days - 7, 0) * 50`
+
+Required worked values — write a unit test asserting every one of these before
+this logic ships:
+
+| Absent days | Penalty (AED) |
+|---|---|
+| 0 | 0 |
+| 1 | 0 |
+| 2 | 0 |
+| 3 | 25 |
+| 4 | 50 |
+| 5 | 75 |
+| 6 | 100 |
+| 7 | 125 |
+| 8 | 175 |
+| 9 | 225 |
+| 10 | 275 |
+
+This must be implemented as a configurable rule (a rates/rules table with tier
+boundaries as data), not a hardcoded function — so tier boundaries can be adjusted
+by an admin without a redeploy. But the DEFAULT/current values must match the table
+above exactly.
+
+## Bonus rule (CONFIRMED FINAL)
+
+Flat 50 AED bonus if `days_absent = 0` for the timesheet's period. No proration —
+even a single absent day forfeits the entire bonus, not a reduced amount.
+
+## Salary floor — never negative (CONFIRMED FINAL)
+
+```
+gross_salary = hours_worked * pay_rate_aed_per_hour
+net_salary = max(0, gross_salary - absence_penalty_amount + bonus_amount)
+```
+
+If `absence_penalty_amount > gross_salary`, do NOT silently absorb the shortfall.
+Instead:
+- Set `needs_attention = true`
+- Set `attention_reason = 'penalty_exceeds_gross'`
+- Block the timesheet from being submitted/approved until a human resolves it
+
+Whether the unrecovered shortfall is forgiven or carried forward to the next pay
+period is an OPEN BUSINESS POLICY QUESTION for the agency, not a technical default.
+Build the schema to support a `carried_forward_amount` field on the next period's
+timesheet regardless of which policy the agency picks, so this isn't a rebuild
+later.
+
+## Client billing rate resolution (CONFIRMED FINAL)
+
+- Never guess or default a `client_charge_rate_aed_per_hour`. If no matching
+  `client_rate_rules` row exists for a worker's (client, trade) pair, leave
+  `client_charge_amount` and `profit_amount` NULL.
+- Set the appropriate `attention_reason`:
+  - `missing_charge_rate` — no rate exists anywhere for this client/trade
+  - `charge_rate_ambiguous` — multiple candidate rates exist and none uniquely match
+  - `missing_trade_for_charge_rate` — worker/timesheet has no trade assigned, so no
+    rate lookup is possible at all
+- A single trade having different rates across different clients is NORMAL and
+  expected (e.g., Helper = 7 AED at MCC vs 8 AED at AL TAWASUL). This is not itself
+  an error condition — it only becomes `charge_rate_ambiguous` when the system can't
+  determine which specific client/trade combination applies to a given row.
+
+## Worker identity resolution (CONFIRMED FINAL)
+
+- Match incoming timesheet rows to workers by `worker_code` first, always.
+- Only fall back to fuzzy name matching via `worker_name_aliases` when no code is
+  present in the source file, and require human confirmation before trusting a new
+  alias for future automatic matching.

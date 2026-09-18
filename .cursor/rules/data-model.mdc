@@ -1,0 +1,71 @@
+---
+description: Core data model rules for the staffing ERP rebuild
+globs: ["supabase/**", "**/migrations/**", "**/*schema*", "**/models/**"]
+alwaysApply: false
+---
+
+# Data Model Rules
+
+This project replaces a previous build that failed due to a rigid schema that
+couldn't handle real-world variability in client timesheets. Follow these rules
+strictly when creating or modifying tables.
+
+## Core entity distinctions (never conflate these)
+
+- `staffing_company` = who EMPLOYS the worker (only two values exist today: AH or SAH).
+- `clients` = who the worker is PLACED WITH and who gets BILLED (e.g., MCC, AL TAWASUL,
+  SAIF Technical, Intergrande BKC, Chenoth, Rhobos). These are never the same field
+  and must never be merged into one column.
+- `worker_code` is the permanent, stable primary business key for a worker. NEVER
+  regenerate it during an import or migration. All joins to a worker should prefer
+  `worker_code` over any auto-generated UUID when matching incoming data.
+
+## Required tables (do not skip any of these)
+
+1. `workers` — master record, includes `worker_code` (unique), `full_name`,
+   `staffing_company`, `trade`, `status`.
+2. `worker_name_aliases` — maps alternate name spellings back to a canonical
+   `worker_code`, with `confirmed_by` and `confirmed_at`. Must require human
+   confirmation before an alias is trusted for auto-matching.
+3. `clients` — billing/end-client master record.
+4. `client_rate_rules` — billing rate card: `client_id`, `trade`,
+   `rate_aed_per_hour`, `effective_from`, `effective_to`, `source_document`.
+   A trade CAN have different rates across different clients — this is expected,
+   not a data error. Only flag ambiguity when a specific (client, trade) pair has
+   NO matching row at all.
+5. `timesheet_raw_rows` — universal landing table. Every uploaded file (CSV, XLSX,
+   or PDF-extracted) lands here first as untouched JSONB (`raw_data` column) before
+   any field mapping happens. Never assume a fixed column set anywhere upstream of
+   this table.
+6. `timesheet_source_files` — one row per uploaded file, links to `parser_template_id`.
+7. `parser_templates` — one row per (client, format version), with `field_mappings`
+   (JSONB), `effective_from`, and `period_inference_rule`. A new client file layout
+   is ALWAYS a new template row, never a code change. Never overwrite an existing
+   template — version it.
+8. `pending_field_review` — any raw column with no mapping rule in the active
+   template gets logged here automatically, surfaced as a queue. Never silently drop
+   or silently guess-map an unrecognized column.
+9. `timesheet_normalized_rows` — cleaned rows after applying a parser template.
+10. `timesheets` — the final record. Must include BOTH:
+    - `service_period_start` / `service_period_end` (when work actually happened)
+    - `reporting_period_start` / `reporting_period_end` (when it was imported)
+    These are never the same field. This is how late-added or missing entries
+    submitted in a later batch get attributed to the correct month.
+11. `timesheet_adjustments` — retroactive corrections with `reason_code`,
+    `changed_by`, `changed_at`. RLS is mandatory on this table (see security.mdc).
+12. `salary_sheets` and `client_payouts` — aggregation roll-ups. Reference included
+    `timesheet_ids` via a proper join table, never a raw array column.
+
+## Rate and charge fields on `timesheets`
+
+- `client_charge_rate_aed_per_hour` — nullable. NULL means "not yet resolved."
+  Never default this to 0 or guess a value from an unrelated client/trade.
+- `client_charge_amount` and `profit_amount` must also be NULL (not 0) when the
+  rate is unresolved. The UI layer is responsible for rendering NULL as
+  "Rate not set" — this is a display concern, not a schema concern.
+
+## Bulk import safety
+
+Any bulk worker or rate import must run as a three-way diff against existing data
+(new / changed / unchanged) and must never blindly overwrite or regenerate primary
+keys. Always produce a preview/diff output before any write is committed.
