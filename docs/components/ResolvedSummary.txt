@@ -1,0 +1,6 @@
+ResolvedSummary
+
+Admin-only page. Queries audit_log for timesheets updates in a date range
+and counts rows where old_value.attention_reason was set and differs from
+new_value.attention_reason. Staff hitting /admin/resolved are redirected
+home. This stays empty until the queue is used.

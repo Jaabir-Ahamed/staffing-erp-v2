@@ -1,0 +1,6 @@
+LoginForm
+
+Client sign-in form for StaffHub. Uses email/password against Supabase Auth
+(createBrowserClient + signInWithPassword). There is no registration link.
+On success it routes to Needs Attention (/). Role is not read from the JWT;
+private.is_staff() / private.is_admin() look up public.users by auth.uid().

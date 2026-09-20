@@ -1,0 +1,6 @@
+Emp ID,Employee Name,Trade,Hours,Absent,From,To
+AH-001,Jean Marie Niyonkuru,Electrician,184,0,01/03/2026,31/03/2026
+AH-001,Jean Marie Niyonkuru,Electrician,12,0,01/03/2026,31/03/2026
+AH-003,Other Worker,Electrician,not-a-number,0,01/03/2026,31/03/2026
+,Missing Code,Electrician,8,0,01/03/2026,31/03/2026
+AH-004,Bad Dates,Electrician,8,0,32/13/2026,01/03/2026

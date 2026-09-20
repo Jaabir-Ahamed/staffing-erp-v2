@@ -4,9 +4,13 @@
 node_modules/
 .DS_Store
 dist/
+.next/
+out/
 .supabase/
 supabase/.temp/
 supabase/.branches/
 __pycache__/
 *.pyc
-.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+

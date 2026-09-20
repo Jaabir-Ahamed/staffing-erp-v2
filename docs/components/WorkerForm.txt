@@ -1,0 +1,8 @@
+WorkerForm
+
+/workers/new. Required operational fields first: worker_code, full_name,
+staffing_company, trade, status, pay_rate_aed_per_hour. Phase 3.5 compliance
+columns sit in a collapsed "Compliance details" disclosure so creation is not
+a 36-field wall. Save calls createWorker, which INSERTs through the session
+client (workers_insert_staff RLS). audit_log insert is written by the existing
+workers_audit trigger, not by the app.

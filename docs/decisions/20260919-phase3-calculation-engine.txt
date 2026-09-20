@@ -1,0 +1,24 @@
+Phase 3 calculation engine (2026-09-19)
+
+Decision
+- Money on timesheets: bonus_amount and absence_penalty_amount are computed and
+  stored. gross_salary, net_salary, client_charge_amount, and profit_amount stay
+  generated columns (NULL charge/profit when the charge rate is unresolved).
+- Penalty tiers come from absence_penalty_tiers (defaults match the worked table).
+  Bonus is 50 AED only when days_absent = 0. Net is floored at 0.
+- Charge rates are looked up by (client_id, trade, service period). Different
+  clients having different rates for the same trade is normal. A service period
+  that spans two Intergrande SCAFFOLDER windows is charge_rate_ambiguous.
+- needs_attention is always recomputed from current data (never a sticky flag).
+  Precedence: missing_client_lookup, worker_unmatched, duplicate_worker_name,
+  missing_pay_rate, missing_trade_for_charge_rate, missing_charge_rate,
+  charge_rate_ambiguous, penalty_exceeds_gross, late_submission.
+- Unmatched workers and unresolved clients are not inserted into timesheets
+  (worker_id and client_id remain NOT NULL). The 304 placeholder-client
+  timesheets stay a post-Phase-3 migration gap.
+
+Schema (drafted, not applied)
+- private.prevent_timesheet_leave_draft_when_attention on public.timesheets.
+  No new tables, so no new RLS policies.
+
+Do not apply until reviewed. Do not copy worker-management timesheets in this phase.

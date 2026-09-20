@@ -1,0 +1,16 @@
+AttentionQueue / ResolveControls
+
+Default landing for staff and admin. Lists flagged timesheets with worker,
+staffing company, service period, hours, and attention_reason. Inline
+resolution is explicit: native client select (10 clients), trade picker
+(no HELPER default), worker search-select, or pay-rate entry. Save calls
+resolveTimesheetAttention, which re-runs computeTimesheet and updates the
+row in the authenticated session so write_audit_log records action=update,
+table_name=timesheets, user_id=auth.uid().
+
+Visual: summary metric cards (Total flagged / Missing client / Missing
+trade / Other flags), toolbar dropdowns for the existing reason/client/
+company filters, denser rows, Details text link, and a count badge on
+the client name for how many rows in the current view share that
+client+company. Assign trade options come from client_rate_rules only,
+scoped to the timesheet's client when that client has rules.

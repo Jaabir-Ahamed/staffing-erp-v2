@@ -1,0 +1,6 @@
+ClientsBoard
+
+Lists the 10 billing clients and their rate rules. Pairs whose windows overlap
+for the same client+trade are marked “Overlapping window”. Insert/update/delete
+on clients and rate rules are admin-only, matching existing RLS. Staff see the
+same data read-only.

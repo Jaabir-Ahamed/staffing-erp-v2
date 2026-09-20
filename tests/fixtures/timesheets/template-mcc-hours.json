@@ -1,0 +1,17 @@
+{
+  "client_id": "10000000-0000-0000-0000-000000000001",
+  "version": 1,
+  "effective_from": "2026-01-01",
+  "field_mappings": {
+    "Emp ID": "worker_code",
+    "Employee Name": "worker_name",
+    "Trade": "trade",
+    "Hours": "hours_worked",
+    "Absent": "days_absent",
+    "From": "service_period_start",
+    "To": "service_period_end"
+  },
+  "date_format": "DD/MM/YYYY",
+  "period_inference_rule": "explicit_start_end_columns",
+  "notes": "Test template for MCC-style hour summaries. Not applied to remote."
+}

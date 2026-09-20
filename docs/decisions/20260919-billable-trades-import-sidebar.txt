@@ -1,0 +1,15 @@
+2026-09-19 assign-trade from rate rules, timesheet landing, sidebar account
+
+Assign trade
+- Dropdown reads DISTINCT trade FROM client_rate_rules, not workers.trade.
+- If the timesheet already has a client with rules, only that client's
+  trades are listed. Otherwise each option names the clients that bill it.
+- workers.trade is unchanged.
+
+Timesheet import, first pass
+- /timesheets/import lands CSV into timesheet_source_files + timesheet_raw_rows
+  and pending_field_review. No parser template (none exist; do not guess).
+- Normalization and promotion to timesheets wait on a sample file + template.
+
+Sidebar
+- User name, role, and Sign out sit under the brand, above primary nav.

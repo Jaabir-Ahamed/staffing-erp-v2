@@ -1,0 +1,12 @@
+WorkersBoard
+
+Workers list default is a 4-column card grid: code + status icon,
+nationality tag, name, trade, staffing company, and Details / All TS
+text links. Details goes to /workers/[id]; All TS uses the existing
+/timesheets?worker= filter. Grid/list toggle is local view state.
+Search still posts q to listWorkers. Trade, nationality, and compliance
+dropdowns add WHERE clauses on the same listWorkers query. Metric cards
+(Total / Active / Inactive) are counted from the already-fetched rows.
+
+Add worker and Import workers live on the page header (/workers/new,
+/workers/import). Edit is still not shown on the cards.

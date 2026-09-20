@@ -1,0 +1,13 @@
+{
+  "client_id": "10000000-0000-0000-0000-000000000001",
+  "version": 1,
+  "effective_from": "2026-01-01",
+  "field_mappings": {
+    "Emp ID": "worker_code",
+    "Hours": "hours_worked",
+    "Date": "service_date"
+  },
+  "date_format": "DD/MM/YYYY",
+  "period_inference_rule": "single_date_as_start_and_end",
+  "notes": "Single-date PDF layout fixture."
+}

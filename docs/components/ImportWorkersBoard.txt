@@ -1,0 +1,8 @@
+ImportWorkersBoard
+
+/workers/import. CSV is parsed with extractCsv, columns are mapped onto the
+36 fillable worker fields, then previewWorkersImport validates required fields
+and duplicate worker_code (file + existing roster) before any write.
+importWorkers inserts only valid rows one at a time and returns a per-row
+success/failure summary. Same session INSERT path as WorkerForm; audit_log is
+the workers_audit trigger.

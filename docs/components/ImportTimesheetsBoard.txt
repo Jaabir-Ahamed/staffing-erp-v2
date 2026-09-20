@@ -1,0 +1,7 @@
+ImportTimesheetsBoard
+
+/timesheets/import. Staff pick client + AH/SAH, upload CSV. landTimesheetUpload
+writes timesheet_source_files (status pending, no parser_template_id) and
+timesheet_raw_rows, and queues every column in pending_field_review. No
+parser template is created and rows are not promoted to timesheets. CSV only
+in this pass.

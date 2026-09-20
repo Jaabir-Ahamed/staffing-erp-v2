@@ -1,0 +1,10 @@
+{
+  "engine": "camelot-lattice",
+  "confidence": 0.42,
+  "needs_review": true,
+  "warnings": ["camelot accuracy 42%"],
+  "headers": ["Emp ID", "Hours", "Date"],
+  "rows": [
+    { "Emp ID": "AH-001", "Hours": "8", "Date": "01/03/2026" }
+  ]
+}

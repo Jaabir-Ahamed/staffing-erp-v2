@@ -9,7 +9,7 @@ import {
   calculateProfitAmount,
   penaltyExceedsGross,
 } from "../../src/calculations/salary.ts";
-import { resolveChargeRate } from "../../src/calculations/charge-rate.ts";
+import { coveringChargeRules, resolveChargeRate } from "../../src/calculations/charge-rate.ts";
 import { canLeaveDraft, computeTimesheet } from "../../src/calculations/compute.ts";
 import type { ChargeRateRule } from "../../src/calculations/charge-rate.ts";
 
@@ -264,4 +264,16 @@ test("worker_unmatched and missing_client_lookup never invent a worker or client
   }));
   assert.equal(noClient.attention_reason, "missing_client_lookup");
   assert.equal(noClient.client_charge_rate_aed_per_hour, null);
+});
+
+test("coveringChargeRules lists the overlapping client+trade window for display", () => {
+  const covering = coveringChargeRules({
+    rules: rateRules,
+    client_id: MCC,
+    trade: "HELPER",
+    service_period_start: "2026-05-01",
+    service_period_end: "2026-05-31",
+  });
+  assert.equal(covering.length > 0, true);
+  assert.equal(covering.every((rule) => rule.client_id === MCC), true);
 });

@@ -1,0 +1,62 @@
+Fusonic / rona:systems ERP reskin (visual only)
+
+Follows https://www.fusonic.net/en/work/style-guide-erp-software.
+No query, RLS, route, or computeTimesheet changes.
+
+Styling system: Tailwind v4 + existing shadcn CSS variables in
+app/globals.css. Tokens were added there rather than introducing a
+second styling approach.
+
+Typography
+  Font: Public Sans (next/font/google, OFL), chosen in the guide for
+  small-size table readability.
+  Scale (size / weight / line-height):
+    page title     22px / 600 / 28px  (.type-page)
+    section header 16px / 600 / 24px  (.type-section)
+    table header   11px / 600 / 16px  (.type-table, uppercase)
+    body           13px / 400 / 20px  (.type-body)
+    helper / meta  12px / 400 / 16px  (.type-meta)
+  Nav and inline Fluent icons are 20px and 16px respectively.
+
+Palette (USWDS v3, Public Sans companion; rona hex unpublished)
+  Light
+    primary          #005EA2
+    primary-hover    #1A4480
+    primary-active   #162E51
+    primary-fg       #FFFFFF
+    focus ring       #2491FF
+    gray-90 text     #1B1B1B
+    gray-70 meta     #565C65
+    gray-20 border   #DFE1E2
+    gray-5 muted     #F0F0F0
+    sidebar          #F5F6F7
+    warning          #8C5E00 on #FAF3D1  (all attention flags)
+    success          #216E4E on #E3F5E8  (Clear)
+    error            #B50909             (destructive / overlap)
+  Dark (.dark, unused in UI for now)
+    primary          #58B4FF
+    primary-hover    #A8D5FF
+    primary-fg       #0B1F33
+    background       #1B1B1B
+    card / sidebar   #2E2E2E
+    text             #F0F0F0
+    meta             #A9AEB1
+    warning          #FACE00 on #3D2E00
+    success          #70E17B on #1C3326
+    error            #FF8D85
+
+Component states (buttons, nav, badges, inputs)
+  default / hover / focus / disabled are defined on .ui-control,
+  .ui-nav, and button/badge variants. Active nav uses primary tint
+  plus primary text, not a new color per route.
+
+Icons
+  @fluentui/react-icons 2.0.341 — Microsoft Fluent UI System Icons,
+  Regular (outline) weight.
+
+Needs Attention structure
+  All five flag types share a .resolve-panel (left warning rule,
+  label, control, Save). missing_client_lookup uses a native select
+  of the 10 clients plus Save on one row so the 301-row queue is
+  scannable; worker matching still uses SearchSelect because the
+  worker list is large.

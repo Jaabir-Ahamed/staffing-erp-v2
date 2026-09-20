@@ -1,0 +1,11 @@
+computeTimesheet / promoteNormalizedTimesheet
+
+Pure calculation engine (no UI). computeTimesheet derives bonus, absence penalty,
+gross, net (floor 0), client charge, profit, and needs_attention from the current
+row plus payroll_rule_sets / client_rate_rules. Recalculating with a fix (pay rate,
+trade, worker match) auto-clears a resolved flag and may replace it with the next
+remaining reason.
+
+promoteNormalizedTimesheet will not persist a timesheet without a matched
+worker_id and billing client_id. Status cannot leave draft while needs_attention
+is true (DB trigger + canLeaveDraft).

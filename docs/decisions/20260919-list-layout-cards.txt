@@ -1,0 +1,19 @@
+List layout (metric cards, toolbar, worker grid)
+
+Layout-only pass on top of the Fusonic tokens. No query, RLS, or
+computeTimesheet changes.
+
+Needs Attention, Timesheets, Workers, and Clients now open with
+summary metric cards (4px semantic left border) and a single toolbar
+row. Existing filters were restyled as bordered Select dropdowns that
+write the same URL params. Native <select> filters are gone from those
+list screens.
+
+Workers default to a card grid (table remains behind a view toggle).
+Needs Attention rows are denser: Details text link instead of a second
+"Open timesheet" line, flag+client grouped, and a count badge for how
+many current-view rows share that client and company.
+
+Export was not added — there is no existing export action to restyle.
+Worker expiry/expiring-soon cards were not added — no expiry-window
+logic exists in the app; cards use Active/Inactive from worker.status.

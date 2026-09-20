@@ -1,0 +1,4 @@
+Emp ID,Employee Name,Trade,Hours,Absent,From,To,Supervisor
+AH-001,Jean Marie Niyonkuru,Electrician,184,0,01/03/2026,31/03/2026,Khalid
+AH-002,Abdulselam Haji,Plumber,176,1,01/03/2026,31/03/2026,Khalid
+SAH-129,Test Worker,Mason,160,7,01/03/2026,31/03/2026,Fatima

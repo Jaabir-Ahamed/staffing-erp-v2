@@ -1,0 +1,25 @@
+Phase 4 UI (2026-09-19)
+
+Decision
+- No new tables or RLS policies. Auth is Supabase email/password with no public
+  signup. public.users is created by private.handle_new_auth_user from
+  raw_app_meta_data.role (admin vs staff). RLS helpers private.is_staff() and
+  private.is_admin() continue to read public.users by auth.uid().
+- Timesheet resolution uses the logged-in session (never service_role) so
+  private.write_audit_log stores the acting user_id.
+- client_rate_rules INSERT/UPDATE/DELETE are admin-only in SQL. Staff do not
+  get an "add rate rule" control even though the original UI brief mentioned it
+  "where RLS already permits" — RLS does not permit it.
+- Overlapping rate-rule windows are flagged in the clients UI using the same
+  startA<=endB AND startB<=endA test as charge_rate_ambiguous. Rates are never
+  guessed.
+- Admin resolved-items summary reads audit_log timesheet updates where
+  old_value.attention_reason is set and differs from new_value.attention_reason.
+  Staff are redirected away from /admin/resolved; they still see shared data
+  everywhere else.
+
+First account
+- Do not create auth.users until the operator supplies the initial admin email.
+  After that: node scripts/create-staff-user.mjs <email> <password> admin
+  with SUPABASE_SERVICE_ROLE_KEY in .env.local. Also disable public signup in
+  the Supabase Auth dashboard.

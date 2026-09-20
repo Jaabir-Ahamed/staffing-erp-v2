@@ -1,0 +1,20 @@
+2026-09-19 worker create/import, lean timesheet detail, list filters
+
+Add worker
+- UI only. RLS already allows staff INSERT (workers_insert_staff).
+- Individual: /workers/new. Batch: /workers/import with preview then commit.
+- Audit: private.write_audit_log on workers INSERT (auth.uid()). No app-side
+  audit_log insert (table is locked to SELECT for authenticated).
+
+Timesheet list/detail
+- List keeps worker, client, company, period, hours, status, flag, Details.
+- Computed columns moved to sectioned /timesheets/[id].
+- coveringChargeRules is display-only; computeTimesheet is unchanged.
+
+Filters (extra WHERE only)
+- Timesheets: trade, service-period overlap (from/to), hours min/max.
+  Specific attention_reason was already on the toolbar.
+- Workers: trade, nationality, compliance windows on existing date columns
+  (passport / labour card / visa expired or expiring within 30 days, Dubai
+  calendar). No expiry-window logic existed before; this is filter WHERE on
+  columns already on the worker row.

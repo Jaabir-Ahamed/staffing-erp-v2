@@ -217,6 +217,20 @@ Clients send CSV, XLSX, and PDF timesheets, all with different, evolving layouts
   `effective_from` — never overwrite an old template, since historical imports must
   stay reproducible.
 
+  Roles: Two roles, staff and admin, enforced at the database via RLS (already built in Phase 1-3.5). Staff see and act on all shared data — workers, timesheets, clients, rate rules — there is no per-staff data siloing. Admin adds two things on top: destructive actions (delete clients/workers/timesheets) and an oversight view into staff activity.
+
+  Primary screen: A Needs Attention queue, not a generic dashboard. With the vast majority of real timesheets currently flagged (missing client match, missing trade, unmatched worker, missing rate), this is the app's functional center — both roles land here first, and resolving flags is the main daily workflow, not an edge case.
+
+  Resolution discipline: Flags are never auto-resolved or guessed by the system. A human explicitly matches a client, assigns a trade, or confirms a worker before a flag clears, consistent with the "no silent invention" principle established in Phase 3's charge-rate-ambiguity logic.
+
+  Admin oversight: A resolved-items summary — who resolved which flags, and how many, over time — rather than a full raw audit-log viewer. This is a lightweight accountability tool, not a general activity feed.
+
+  Accounts: Admin-created only. No public or self-serve signup, since this is an internal tool for a small staffing agency's own staff, not an external-facing product.
+
+  Data screens: Workers (with UAE compliance fields from Phase 3.5), timesheets (with full computed breakdown for audit), and clients/rate rules (with visual flagging of overlapping rate windows so staff understand why a charge is stuck at NULL).
+
+  Out of scope this phase: Salary sheets and client payouts UI (no real data yet), any CRM/invoicing/GL features (already excluded), per-staff data restrictions.
+
 ---
 
 ## 5. Security (non-negotiable, from day one)

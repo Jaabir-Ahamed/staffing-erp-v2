@@ -1,0 +1,6 @@
+InviteUserForm / RoleSelect
+
+Admin-only account creation. Calls Auth Admin createUser with
+app_metadata.role (never user_metadata). The existing
+private.handle_new_auth_user trigger writes public.users so
+private.is_staff() / private.is_admin() see the same role the UI uses.

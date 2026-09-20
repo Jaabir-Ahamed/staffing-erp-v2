@@ -7,6 +7,7 @@ export type ChargeRateRule = {
   effective_from: string;
   effective_to: string | null;
   shift_type: ShiftType | null;
+  source_document?: string | null;
 };
 
 export type ChargeLookupReason =
@@ -75,4 +76,28 @@ export function resolveChargeRate(input: {
     return { rate: null, reason: "charge_rate_ambiguous" };
   }
   return { rate: uniqueRates[0] ?? null, reason: null };
+}
+
+export function coveringChargeRules(input: {
+  rules: ChargeRateRule[];
+  client_id: string;
+  trade: string | null;
+  service_period_start: string;
+  service_period_end: string;
+}): ChargeRateRule[] {
+  if (!input.trade || input.trade.trim() === "") {
+    return [];
+  }
+  const trade = normalizeTrade(input.trade);
+  return input.rules.filter(
+    (rule) =>
+      rule.client_id === input.client_id &&
+      normalizeTrade(rule.trade) === trade &&
+      overlaps(
+        input.service_period_start,
+        input.service_period_end,
+        rule.effective_from,
+        rule.effective_to ?? "9999-12-31",
+      ),
+  );
 }

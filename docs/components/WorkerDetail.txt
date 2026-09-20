@@ -1,0 +1,6 @@
+WorkerDetail
+
+Sidebar shows operational fields (code, trade, pay rate, company, camp) plus
+contact. Tabs: timesheets for that worker, documents (Phase 3.5 passport /
+Emirates ID / labour card / visa — there is no separate documents table),
+and history from audit_log where table_name=workers.

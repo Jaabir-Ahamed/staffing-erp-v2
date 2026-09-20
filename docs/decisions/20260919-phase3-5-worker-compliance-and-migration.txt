@@ -1,0 +1,38 @@
+Phase 3.5 worker compliance fields + real-data migration (2026-09-19)
+
+Part A
+- Migration 20260919190000_phase3_5_worker_compliance_fields.sql adds UAE
+  labor-compliance columns to public.workers. All new columns nullable except
+  overtime_rate which has CHECK >= 0 when present.
+- No new table. Existing workers RLS is unchanged and covers the new columns:
+  SELECT/INSERT/UPDATE for authenticated staff (private.is_staff);
+  DELETE for authenticated admin (private.is_admin); anon has zero grants.
+- Companion 20260919190001_phase3_5_timesheets_unresolved_refs.sql makes
+  timesheets.worker_id and timesheets.client_id nullable so placeholder
+  clients and unmatched workers can land with needs_attention instead of
+  invented FKs. Unique (worker, client, period) is now a partial unique
+  index. Timesheets RLS policies were not modified.
+
+Part B mapping (source uwzlailzveoqudrhchum → target vdqpsgwyqxwrfyqugein)
+- clients: classified billing clients already on TTA (10). Did not insert
+  staffing-company placeholders, project codes, or City Experts (held).
+  Old UUIDs mapped by name onto existing TTA ids.
+- workers: 340 rows, original UUIDs preserved. Seed 202 test/partial rows
+  replaced. staffing_company mapped AH/SAH (full company names + code prefix).
+  nationality falls back to nationality_mohre. labour_card_expiry_date falls
+  back to labor_card_expiry_date.
+- worker_name_aliases: 108 rows from workers.worker_code_aliases[].
+- client_rate_rules: 8 old May-2026 windows already represented as TTA seed
+  rules (same client+trade+rate, open-ended from 2026-01-01). Not re-inserted
+  because client_rate_rules_no_overlap would fire. Intergrande period rates
+  kept. TTA total 12.
+- timesheets: 454. 304 Abdullah-placeholder rows → client_id NULL,
+  attention_reason missing_client_lookup. 21 IBEX rows with no worker →
+  worker_unmatched. computeTimesheet applied bonus/penalty/charge/flags.
+- timesheet_normalized_rows, timesheet_adjustments, salary_sheets,
+  client_payouts: 0 rows on both sides.
+- timesheet_source_files: 1 old row skipped (schema mismatch: old client_id
+  nullable, status 'review', source_type text; new client_id NOT NULL,
+  staffing_company NOT NULL, status pending/parsed/failed, file_type enum).
+  No timesheet referenced it (source_file_id all null).
+- Skipped as requested: documents, timesheet_day_entries, workers_import_raw.

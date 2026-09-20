@@ -1,0 +1,8 @@
+TimesheetDetail
+
+/timesheets/[id] is the full record: Summary, Hours & attendance, Rates
+(with covering client_rate_rules if the client+trade+period overlap),
+Computed amounts split worker-pay vs client-billing, and Provenance
+(source_file_id, import_batch_id, timestamps). Inline ResolveControls stay
+on this page when needs_attention is true. The list page no longer shows
+charge, pay, or other computed columns.
